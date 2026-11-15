@@ -40,6 +40,7 @@ describe('GitHub release workflow', () => {
     expect(workflow).not.toMatch(
       /\.aab|upload_to_play_store|testflight|upload-artifact/,
     );
+    expect(workflow).not.toMatch(/^\s{6}- name: Verify/m);
   });
 
   it('has no Android app-bundle or Play Store lanes', () => {

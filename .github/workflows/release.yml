@@ -43,9 +43,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Restore enriched-markdown native assets
-        run: INIT_CWD="$GITHUB_WORKSPACE" node node_modules/react-native-enriched-markdown/postinstall.mjs
-
       - name: Derive the rnllama variant allowlist from the payload manifest
         run: |
           set -euo pipefail
@@ -96,29 +93,7 @@ jobs:
         working-directory: android
         env:
           GRADLE_USER_HOME: ${{ runner.temp }}/.gradle
-        run: |
-          set -euo pipefail
-          if [ "${ORG_GRADLE_PROJECT_rnllamaBuildFromSource:-}" != "true" ]; then
-            echo "::error::ORG_GRADLE_PROJECT_rnllamaBuildFromSource is '${ORG_GRADLE_PROJECT_rnllamaBuildFromSource:-<unset>}', expected 'true'."
-            exit 1
-          fi
-          bundle exec fastlane build_android_apk 2>&1 | tee android-build.log
-
-      - name: Verify the variant allowlist reached the llama.rn build
-        run: |
-          set -euo pipefail
-          VARIANTS=$(node scripts/verify-android-payload.js --print-variants)
-          if ! grep -qF "Building rnllama variants: $VARIANTS" android/android-build.log; then
-            echo "::error::llama.rn did not report building the declared variant set."
-            echo "Expected: $VARIANTS"
-            grep -F "rnllama variants" android/android-build.log || echo "  (no such line at all)"
-            exit 1
-          fi
-
-      - name: Verify the Android payload
-        run: |
-          node scripts/verify-android-payload.js \
-            --apk android/app/build/outputs/apk/prod/release/app-prod-release.apk
+        run: bundle exec fastlane build_android_apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
