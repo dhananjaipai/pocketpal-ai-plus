@@ -11,6 +11,8 @@ const androidBuild = read('android/app/build.gradle');
 describe('GitHub release workflow', () => {
   it('runs on pushes to main', () => {
     expect(workflow).toMatch(/^\s{2}push:\n\s{4}branches:\n\s{6}- main$/m);
+    expect(workflow).toMatch(/^\s{2}workflow_dispatch:$/m);
+    expect(workflow).toMatch(/^\s{4}if: github\.ref == 'refs\/heads\/main'$/m);
   });
 
   it('builds the APK with Plus unlocked by default', () => {
