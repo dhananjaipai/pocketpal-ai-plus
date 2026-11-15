@@ -26,6 +26,12 @@ describe('GitHub release workflow', () => {
     expect(androidBuild).toMatch(/findProperty\("appVersionCode"\)/);
   });
 
+  it('uses example configuration without requiring repository secrets', () => {
+    expect(workflow).toMatch(/cp \.env\.example \.env/);
+    expect(workflow).toMatch(/ci-placeholder/);
+    expect(workflow).not.toMatch(/secrets\.(?!GITHUB_TOKEN)/);
+  });
+
   it('publishes only the APK to a commit-specific GitHub release', () => {
     expect(workflow).toMatch(/tag_name: "main-\$\{\{ github\.sha \}\}"/);
     expect(workflow).toMatch(
